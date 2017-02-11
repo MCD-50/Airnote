@@ -65,10 +65,10 @@ class MainPage extends Component {
         super(params);
         this.state = {
             dataSource: ds.cloneWithRows([]),
-            notes: [],
             searchText: '',
             isLoading: true,
             isLoaded: false,
+            isEmpty: false,
         }
 
         this.cameFromNewNote = this.cameFromNewNote.bind(this);
@@ -78,77 +78,37 @@ class MainPage extends Component {
         this.onChangeText = this.onChangeText.bind(this);
         this.renderListItem = this.renderListItem.bind(this);
         this.renderEmptyMessage = this.renderEmptyMessage.bind(this);
-
+        this.viewNote = this.viewNote.bind(this);
+        this.setDataToDatabase = this.setDataToDatabase.bind(this);
     }
 
 
     componentWillMount() {
-        DatabaseHelper.getAllNotes((notes) => {
-            let _notes = Object.keys(notes.rows).map((id) => {
-                const item = notes.rows[id];
-                let note = new Note(item.title, item.description, item.createdOn);
-                note.setId(item._id);
-                return note;
-            })
+        this.setDataToDatabase();
+    }
 
+    setDataToDatabase() {
+        DatabaseHelper.getAllNotes((notes) => {
             this.setState({
-                notes: _notes,
-                dataSource: ds.cloneWithRows(_notes),
+                dataSource: (notes.length > 0) ? ds.cloneWithRows(notes) : ds.cloneWithRows([]),
                 isLoaded: true,
                 isLoading: false,
+                isEmpty: (notes.length > 0) ? false : true
             });
-        });
-
+        })
     }
 
-    cameFromNewNote(id, note) {
-        note.setId(id);
-
-        if (note) {
-            let length = this.state.dataSource.length - 1;
-            this.setState({
-                notes: this.state.notes.concat([note]),
-                dataSource: this.state.dataSource.cloneWithRows(this.state.notes.concat([note]))
-            })
-        }
+    cameFromNewNote() {
+        this.setDataToDatabase();
     }
 
-    cameFromViewNote(note) {
-        if (note) {
-            let length = this.state.dataSource.length - 1;
-            let index = this.state.notes.indexOf(note);
-            let array = this.state.notes;
-
-            if (index > -1) {
-                array[index] = note;
-                this.setState({
-                    notes: array,
-                    dataSource: this.state.dataSource.cloneWithRows(array)
-                });
-            }
-
-        }
+    cameFromViewNote() {
+        this.setDataToDatabase();
     }
-
 
     onDeleteNote(note) {
-        if (note) {
-            let length = this.state.dataSource.length - 1;
-            let index = this.state.notes.indexOf(note);
-            let array = this.state.notes;
-            console.log(array);
-            if (index > -1) {
-                array.splice(index, 1);
-                console.log(array);
-                this.setState({
-                    notes: array,
-                    dataSource: this.state.dataSource.cloneWithRows(array)
-                });
-            }
-            console.log(this.state);
-        }
+        this.setDataToDatabase();
     }
-
 
 
     renderListItem(item) {
@@ -163,7 +123,7 @@ class MainPage extends Component {
                 minHeight: 50,
                 justifyContent: 'center'
             }}
-                onPress={() => this.props.navigator.push({ id: '3', name: item.title.split('.')[0], 'data': item, 'callback': this.cameFromViewNote, 'onDeleteCallback': this.onDeleteNote })}>
+                onPress={() => this.viewNote(item)}>
                 <View style={styles.listItemContainer}>
                     <Text style={[styles.headerText,]}>
                         {item.title}
@@ -179,9 +139,19 @@ class MainPage extends Component {
         );
     }
 
-    renderEmptyMessage(){
-        if(this.state.notes.length < 1)
-        return (<Text style={[styles.subText, {fontSize:15, marginLeft: 10, marginRight:10, marginTop:5, marginBottom:5}]}>Its empty here. Add a few notes to get started.</Text>)
+    viewNote(item) {
+
+        getStoredDataFromKey(FONTSIZE).then((val) => {
+            if (val)
+                this.props.navigator.push({ id: '3', name: item.createdOn, 'data': item, 'callback': this.cameFromViewNote, 'onDeleteCallback': this.onDeleteNote, textSize: val })
+            else
+                this.props.navigator.push({ id: '3', name: item.createdOn, 'data': item, 'callback': this.cameFromViewNote, 'onDeleteCallback': this.onDeleteNote, textSize: 16 })
+        })
+    }
+
+    renderEmptyMessage() {
+        if (this.state.isEmpty)
+            return (<Text style={[styles.subText, { fontSize: 15, marginLeft: 10, marginRight: 10, marginTop: 5, marginBottom: 5 }]}>Its empty here. Add a few notes to get started.</Text>)
     }
 
     onChangeText(newText) {
@@ -189,7 +159,13 @@ class MainPage extends Component {
     }
 
     createNewNote() {
-        this.props.navigator.push({ id: '4', name: 'New Note', 'callback': this.cameFromNewNote })
+        getStoredDataFromKey(FONTSIZE).then((val) => {
+            console.log(val);
+            if (val)
+                this.props.navigator.push({ id: '4', name: 'New Note', 'callback': this.cameFromNewNote, textSize: val })
+            else
+                this.props.navigator.push({ id: '4', name: 'New Note', 'callback': this.cameFromNewNote, textSize: 16 })
+        })
     }
 
 
@@ -212,7 +188,6 @@ class MainPage extends Component {
                         if (menuItems[action.index] === 'Settings') {
                             console.log('get data');
                             getStoredDataFromKey(FONTSIZE).then((val) => {
-                                console.log(val);
                                 if (val)
                                     this.props.navigator.push({ id: '6', name: 'Settings', textSize: val })
                                 else

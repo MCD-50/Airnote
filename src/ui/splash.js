@@ -36,7 +36,7 @@ class SplashPage extends Component {
             <View style={styles.container}>
                 <StatusBar backgroundColor='black' barStyle='light-content' />
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black', }}>
-                    <Image source={background} style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' }} resizeMode="contain" />
+                    <Image source={background} style={{ width: 150, height: 150, alignItems: 'center', justifyContent: 'center' }} resizeMode="contain" />
                 </View>
             </View>
         );

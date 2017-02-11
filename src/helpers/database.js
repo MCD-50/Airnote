@@ -1,18 +1,27 @@
 import React, { Component } from 'react';
 
 import DB from './factory.js';
+import { Note } from '../model/note.js';
+
 
 class DatabaseHelper extends Component {
 
     //NOTE related functions.
     getAllNotes(callback) {
-        DB.NOTE.get_all(function (results) {
-            callback(results);
+        DB.NOTE.get_all((results) => {
+            let notes = Object.keys(results.rows).map((key) => {
+                return this.convertToNote(results.rows[key]);
+            })
+            callback(notes);
         });
     }
 
+    convertToNote(results){
+        let note = new Note(results.title, results.description, results.createdOn)
+        note.setId(results._id);
+        return note;
+    }
 
-   
     updateNote(noteid, data, callback) {
         DB.NOTE.update_id(noteid, data, function (results) {
             callback(results);

@@ -149,8 +149,8 @@ class SettingPage extends Component {
                                 selectedValue={this.state.textSize}
                                 onValueChange={(size) => this.onValueChange(size)}>
                                 <Picker.Item label="16" value="16" />
+                                <Picker.Item label="17" value="17" />
                                 <Picker.Item label="18" value="18" />
-                                <Picker.Item label="20" value="20" />
                             </Picker>
                         </View>
                     </Card>

@@ -4,7 +4,8 @@ import {
     TextInput,
     StyleSheet,
     BackAndroid,
-    ScrollView
+    ScrollView,
+    Dimensions,
 } from 'react-native';
 
 
@@ -15,8 +16,10 @@ import ActionButton from './custom/actionbutton.js';
 import { UPDOWNMARGIN, SIDEMARGIN } from '../helpers/constant.js';
 import DatabaseHelper from '../helpers/database.js';
 import { Note } from '../model/note.js';
+import { getCreatedOn } from '../helpers/collectionutils.js';
+const {height, width} = Dimensions.get('window');
 
-const MIN_COMPOSER_HEIGHT = 55;
+const MIN_COMPOSER_HEIGHT = 600;
 
 const styles = StyleSheet.create({
     container: {
@@ -58,7 +61,8 @@ class NewPage extends Component {
         super(params);
         this.state = {
             editText: '',
-            height: MIN_COMPOSER_HEIGHT,
+            height: height - 55,
+            textSize: this.props.route.textSize,
         }
 
         this.createNote = this.createNote.bind(this);
@@ -118,17 +122,16 @@ class NewPage extends Component {
         if (text.length > 0) {
             let title = text.length > 10 ? text.substring(0, 10) + '...' : text + '...';
 
-
             let today = new Date();
             var dd = today.getDate();
-            var mm = today.getMonth() + 1; //January is 0!
+            var mm = today.getMonth(); //January is 0!
             var yyyy = today.getFullYear();
-            const date = yyyy + '-' + mm + '-' + dd;
-            let note = new Note(title, text, date);
+            const date = getCreatedOn(yyyy + '-' + mm + '-' + dd);
 
+            let note = new Note(title.trim(), text.trim(), date);
 
             DatabaseHelper.addNewNote(note, (result) => {
-                this.props.route.callback(result._id, note);
+                this.props.route.callback();
                 this.props.navigator.pop();
             })
         }
@@ -139,13 +142,16 @@ class NewPage extends Component {
         // height = height - 55;
         return (
             <ScrollView keyboardDismissMode='interactive'>
+
+ 
                 <TextInput
                     onChange={(e) => this.onType(e)}
-                    style={[styles.textInput, { height: this.state.height }]}
+                    style={[styles.textInput, { height: this.state.height, fontSize:parseInt(this.state.textSize), textAlignVertical: 'top' }]}
                     placeholder={this.props.placeholder}
                     placeholderTextColor={this.props.placeholderTextColor}
                     multiline={this.props.multiline}
-                    autoCapitalize='sentences'
+                    
+                    value={this.state.editText}
                     autoFocus={this.props.autoFocus}
                     enablesReturnKeyAutomatically={true}
                     underlineColorAndroid="transparent" />
