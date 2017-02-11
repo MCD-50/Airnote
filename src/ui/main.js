@@ -5,6 +5,7 @@ import {
     StyleSheet,
     View,
     Text,
+    Linking,
 } from 'react-native';
 
 
@@ -56,6 +57,8 @@ import { setData, getStoredDataFromKey } from '../helpers/appstore.js';
 import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE } from '../helpers/constant.js';
 import DatabaseHelper from '../helpers/database.js';
 import { Note } from '../model/note.js';
+import Communications from 'react-native-communications';
+
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1.id !== r2.id });
 let last = -1;
@@ -195,9 +198,11 @@ class MainPage extends Component {
                             })
 
                         } else if (menuItems[action.index] === 'Share this app') {
-                            //share app
+                            Communications.email(null, null, null, null, 'http://play.google.com/store/apps/details?id=com.air.airnote');
                         } else {
-                            //rate app
+                            //http://play.google.com/store/apps/details?id=com.air.airnote
+                            //market://details?id=PackageName
+                            Linking.openURL('market://details?id=com.air.airnote');
                         }
                     }} />
 

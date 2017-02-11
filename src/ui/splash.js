@@ -28,7 +28,7 @@ class SplashPage extends Component {
         var navigator = this.props.navigator;
         setTimeout(() => {
             navigator.replace({ id: '2', name: 'Airnote'});
-        }, 4000);
+        }, 2000);
     }
 
     render() {

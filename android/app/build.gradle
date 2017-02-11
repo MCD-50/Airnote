@@ -87,7 +87,7 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "com.airnote"
+        applicationId "com.air.airnote"
         minSdkVersion 16
         targetSdkVersion 22
         versionCode 1

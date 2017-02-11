@@ -443,18 +443,20 @@ export default function getTheme(theme, ...more) {
         }, theme.toolbar)),
         toolbarSearchActive: StyleSheet.create(merge({
             container: {
-                backgroundColor: palette.accentColor,
+                backgroundColor: palette.primaryColor,
             },
             leftElement: {
                 color: palette.alternateTextColor,
             },
             centerElementContainer: {
+                
             },
             titleText: {
                 flex: 1,
                 marginLeft: 20,
                 color: palette.alternateTextColor,
                 fontWeight: fontWeight.normal,
+                fontSize: 18,
             },
             rightElement: {
                 color: palette.alternateTextColor,

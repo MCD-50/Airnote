@@ -1,4 +1,4 @@
-package com.airnote;
+package com.air.airnote;
 
 import android.app.Application;
 import android.util.Log;
