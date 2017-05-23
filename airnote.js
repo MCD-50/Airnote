@@ -1,68 +1,59 @@
 import React, { Component } from 'react';
 import {
-    Navigator,
+	Navigator,
 } from 'react-native';
 
 import ThemeProvider from './src/ui/custom/utils/themeprovider.js';
 
 import MainPage from './src/ui/main.js';
-import NewPage from './src/ui/newnote.js';
 import SplashPage from './src/ui/splash.js';
-import ViewPage from './src/ui/viewnote.js';
 import EditPage from './src/ui/editnote.js';
 import SettingPage from './src/ui/setting.js';
 
 
 const uiTheme = {
-    toolbar: {
-        container: {
-            height: 55,
-        },
-    },
+	toolbar: {
+		container: {
+			height: 55,
+		},
+	},
 };
 
 class Airnote extends Component {
-    constructor(params) {
-        super(params);
-    }
+	constructor(params) {
+		super(params);
+	}
 
-    renderScene(route, navigator) {
-        let routeId = route.id;
-        
-        if (routeId == 1) {
-            return (<SplashPage navigator={navigator} route={route} />);
-        }
-        else if (routeId == 2) {
-            return (<MainPage navigator={navigator} route={route} />);
-        }
-        else if (routeId == 3) {
-            return (<ViewPage navigator={navigator} route={route} />);
+	renderScene(route, navigator) {
+		let routeId = route.id;
 
-        } else if (routeId == 4) {
-            return (
-                <NewPage navigator={navigator} route={route} />
-            );
-        } else if (routeId == 5) {
-            return (
-                <EditPage navigator={navigator} route={route} />
-            );
-        }else if (routeId == 6) {
-            return (
-                <SettingPage navigator={navigator} route={route} />
-            );
-        }
-    }
+		if (routeId == 1) {
+			return (<SplashPage navigator={navigator} route={route} />);
+		}
+		else if (routeId == 2) {
+			return (<MainPage navigator={navigator} route={route} />);
+		}
+		else if (routeId == 3) {
+			return (
+				<EditPage navigator={navigator} route={route} />
+			);
+		} else if (routeId == 4) {
+			return (
+				<SettingPage navigator={navigator} route={route} />
+			);
+		}
+	}
 
 
-    render() {
-        return (
-            <ThemeProvider uiTheme={uiTheme}>
-                <Navigator initialRoute={{ id: '1', name: 'Splash' }}
-                    renderScene={this.renderScene.bind(this)}
-                    configureScene={(route, routeStack) => Navigator.SceneConfigs.FloatFromBottomAndroid} />
-            </ThemeProvider>
-        )
-    }
+	render() {
+		return (
+			<ThemeProvider uiTheme={uiTheme}>
+				<Navigator initialRoute={{ id: '1', name: 'Splash' }}
+					renderScene={this.renderScene.bind(this)}
+					configureScene={(route, routeStack) => Navigator.SceneConfigs.FloatFromBottomAndroid} />
+			</ThemeProvider>
+		)
+	}
 
 }
 
