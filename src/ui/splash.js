@@ -1,46 +1,28 @@
-import React, { Component, PropTypes, } from 'react';
-import { View, 
-    StyleSheet, 
-    Image, 
-    StatusBar
-} from 'react-native';
+import React, { Component } from 'react';
 
+import { View, Image, StatusBar } from 'react-native';
+import { Page } from '../enums/page.js';
+import styles from '../helpers/styles.js';
+import { propTypes } from '../helpers/constant.js';
 const background = require('../res/splash.png');
 
-const styles = StyleSheet.create({
-    container: {
-        flex:1,
-    },
-});
-
-const propTypes = {
-    navigator: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired,
-};
 
 class SplashPage extends Component {
+	componentDidMount() {
+		const page = Page.MAIN_PAGE;
+		setTimeout(() => this.props.navigator.replace({ id: page.id, name: page.name }), 1500);
+	}
 
-    constructor(params){
-        super(params);
-    }
-    
-    componentDidMount() {
-        var navigator = this.props.navigator;
-        setTimeout(() => {
-            navigator.replace({ id: '2', name: 'Airnote'});
-        }, 2000);
-    }
-
-    render() {
-        return (
-            <View style={styles.container}>
-                <StatusBar backgroundColor='black' barStyle='light-content' />
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'black', }}>
-                    <Image source={background} style={{ width: 150, height: 150, alignItems: 'center', justifyContent: 'center' }} resizeMode="contain" />
-                </View>
-            </View>
-        );
-    }
+	render() {
+		return (
+			<View style={styles.container_with_flex_1}>
+				<StatusBar backgroundColor='black' barStyle='light-content' />
+				<View style={styles.splash_screen_view}>
+					<Image source={background} style={styles.splash_screen_image} resizeMode="contain" />
+				</View>
+			</View>
+		);
+	}
 }
 
 SplashPage.propTypes = propTypes;

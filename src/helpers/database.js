@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import DB from './factory.js';
-import { Note } from '../model/note.js';
+import { Note } from '../models/note.js';
 
 
 class DatabaseHelper extends Component {

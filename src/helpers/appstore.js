@@ -1,33 +1,18 @@
-import React, { Component } from 'react';
-import { AsyncStorage } from 'react-native';
+import React, { Component } from "react";
+import { AsyncStorage } from "react-native";
 
-
-
-export function getStoredDataFromKey(key) {
-    return getStoredDataFromKeyAsync(key);
+export async function getData(key) {
+	try {
+		return await AsyncStorage.getItem(key);
+	} catch (error) {
+		return null;
+	}
 }
 
-
-async function getStoredDataFromKeyAsync(key) {
-    try {
-        return await AsyncStorage.getItem(key);
-    } catch (error) {
-        console.log(error)
-        return null;
-    }
+export async function setData(key, data) {
+	try {
+		await AsyncStorage.setItem(key, data);
+	} catch (error) {
+		console.log(error);
+	}
 }
-
-export function setData(key, data) {
-    setDataAsync(key, data);
-}
-
-async function setDataAsync(key, data) {
-    try {
-        await AsyncStorage.setItem(key, data);
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-
-

@@ -1,85 +1,34 @@
 import React, { Component, PropTypes } from 'react';
-import {
-	Navigator,
-	ListView,
-	StyleSheet,
-	View,
-	Text,
-	Linking,
-} from 'react-native';
+import { ListView, View, Text, Linking } from 'react-native';
 
-
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-
-	listItemContainer: {
-		flex: 1,
-		marginLeft: SIDEMARGIN,
-		marginRight: SIDEMARGIN,
-		padding: UPDOWNMARGIN,
-		justifyContent: 'flex-start',
-		alignItems: 'flex-start',
-	},
-
-	headerText: {
-		fontSize: 17,
-		fontWeight: '400',
-		color: 'black',
-	},
-
-	subText: {
-		marginTop: 2,
-		fontSize: 14,
-		fontWeight: 'normal',
-		color: '#757575'
-	}
-});
-
-
-const propTypes = {
-	navigator: PropTypes.object.isRequired,
-	route: PropTypes.object.isRequired,
-};
-
-const menuItems = ['Share this app', 'Rate this app', 'Settings']
-
-import Toolbar from './custom/toolbar.js';
-import Container from './container.js';
-import ActionButton from './custom/actionbutton.js';
-import Card from './custom/card.js';
-
-import SettingPage from './setting.js';
-import { setData, getStoredDataFromKey } from '../helpers/appstore.js';
+import { Toolbar, ActionButton, Card } from 'react-native-material-component'
+import { getData } from '../helpers/appstore.js';
 import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE } from '../helpers/constant.js';
+import { Page } from '../enums/page.js';
+import Container from './container.js';
+import SettingPage from './setting.js';
 import DatabaseHelper from '../helpers/database.js';
-import { Note } from '../model/note.js';
 import Communications from 'react-native-communications';
+import styles from '../helpers/styles.js';
+import { propTypes, mainPageMenuItems } from '../helpers/constant.js';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1.id !== r2.id });
-let last = -1;
 
 class MainPage extends Component {
 	constructor(params) {
 		super(params);
 		this.state = {
 			dataSource: ds.cloneWithRows([]),
-			searchText: '',
-			isLoading: true,
-			isLoaded: false,
 			isEmpty: false,
 		}
 
-		this.callback = this.callback.bind(this);
-		this.onChangeText = this.onChangeText.bind(this);
-		this.renderListItem = this.renderListItem.bind(this);
-
-		this.renderEmptyMessage = this.renderEmptyMessage.bind(this);
-
-		this.createViewAndEditNote = this.createViewAndEditNote.bind(this);
 		this.setDataToDatabase = this.setDataToDatabase.bind(this);
+		this.createViewAndEditNote = this.createViewAndEditNote.bind(this);
+		this.onRightElementPress = this.onRightElementPress.bind(this);
+		this.callback = this.callback.bind(this);
+
+		this.renderListItem = this.renderListItem.bind(this);
+		this.renderEmptyMessage = this.renderEmptyMessage.bind(this);
 	}
 
 
@@ -91,8 +40,6 @@ class MainPage extends Component {
 		DatabaseHelper.getAllNotes((notes) => {
 			this.setState({
 				dataSource: (notes.length > 0) ? ds.cloneWithRows(notes) : ds.cloneWithRows([]),
-				isLoaded: true,
-				isLoading: false,
 				isEmpty: (notes.length > 0) ? false : true
 			});
 		})
@@ -102,26 +49,59 @@ class MainPage extends Component {
 		this.setDataToDatabase();
 	}
 
-	renderListItem(item) {
-		let searchText = this.state.searchText.toLowerCase();
+	createViewAndEditNote(item) {
+		getData(FONTSIZE)
+			.then((val) => {
+				const page = Page.EDIT_PAGE;
+				const data = {
+					note: item,
+					callback: this.callback,
+					textSize: val ? val : 16
+				};
+				this.props.navigator.push({ id: page.id, name: page.name, data: data });
+			});
+	}
 
-		if (searchText.length > 0 && item.description.toLowerCase().indexOf(searchText) < 0) {
-			return null;
+	onRightElementPress(index) {
+		if (mainPageMenuItems[index] === 'Settings') {
+			getData(FONTSIZE)
+				.then((val) => {
+					const page = Page.SETTING_PAGE;
+					const data = {
+						textSize: val ? val : 16
+					};
+					this.props.navigator.push({ id: page.id, name: page.name, data: data })
+				});
+		} else if (mainPageMenuItems[index] === 'Share this app') {
+			Communications.email(null, null, null, null, 'http://play.google.com/store/apps/details?id=com.air.airnote');
+		} else if (mainPageMenuItems[index] === 'Rate this app') {
+			Linking.openURL('market://details?id=com.air.airnote');
 		}
+	}
 
+	renderEmptyMessage() {
+		if (this.state.isEmpty)
+			return (
+				<Text style={[styles.main_page_description_text, { fontSize: 15, marginLeft: 10, marginRight: 10, marginTop: 5, marginBottom: 5 }]}>
+					Its empty here. Add a few notes to get started.
+				</Text>
+			);
+		return null;
+	}
+
+	renderListItem(item) {
+		const title = item.title.replace(/(<([^>]+)>)/g, "_%_").split("_%_").join(' ').trim();
+		const description = item.description.replace(/(<([^>]+)>)/g, "_%_").split("_%_").join(' ').trim();
 		return (
-			<Card style={{
-				minHeight: 50,
-				justifyContent: 'center'}}
-				onPress={() => this.createViewAndEditNote(item)}>
-				<View style={styles.listItemContainer}>
-					<Text style={[styles.headerText,]}>
-						{item.title}
+			<Card style={styles.card_view} fullWidth="1" onPress={() => this.createViewAndEditNote(item)}>
+				<View style={styles.main_page_list_item_container}>
+					<Text style={styles.main_page_header_text}>
+						{title}
 					</Text>
-					<Text style={styles.subText}>
-						{item.description.substring(0, 50) + '...'}
+					<Text style={styles.main_page_description_text}>
+						{description.substring(0, 50) + '...'}
 					</Text>
-					<Text style={styles.subText}>
+					<Text style={styles.main_page_footer_text}>
 						{item.createdOn}
 					</Text>
 				</View>
@@ -129,54 +109,13 @@ class MainPage extends Component {
 		);
 	}
 
-	createViewAndEditNote(item) {
-		getStoredDataFromKey(FONTSIZE).then((val) => {
-			if (val)
-				this.props.navigator.push({ id: '3', name: 'New Note', data: item, 'callback': this.callback, textSize: val })
-			else
-				this.props.navigator.push({ id: '3', name: 'New Note', data: item, 'callback': this.callback, textSize: 16 })
-		})
-	}
-
-	renderEmptyMessage() {
-		if (this.state.isEmpty)
-			return (<Text style={[styles.subText, { fontSize: 15, marginLeft: 10, marginRight: 10, marginTop: 5, marginBottom: 5 }]}>Its empty here. Add a few notes to get started.</Text>)
-	}
-
-	onChangeText(newText) {
-		this.setState({ searchText: newText });
-	}
-
-
 	render() {
 		return (
 			<Container>
 				<Toolbar
 					centerElement={this.props.route.name}
-					searchable={{
-						autoFocus: true,
-						placeholder: 'Search note...',
-						onChangeText: (value) => this.onChangeText(value),
-						onSearchClosed: () => this.setState({ searchText: '' }),
-					}}
-					rightElement={{
-						menu: { labels: menuItems },
-					}}
-
-					onRightElementPress={(action) => {
-						if (menuItems[action.index] === 'Settings') {
-							getStoredDataFromKey(FONTSIZE).then((val) => {
-								if (val)
-									this.props.navigator.push({ id: '4', name: 'Settings', textSize: val })
-								else
-									this.props.navigator.push({ id: '4', name: 'Settings', textSize: '16' })
-							})
-						} else if (menuItems[action.index] === 'Share this app') {
-							Communications.email(null, null, null, null, 'http://play.google.com/store/apps/details?id=com.air.airnote');
-						} else if (menuItems[action.index] === 'Rate this app') {
-							Linking.openURL('market://details?id=com.air.airnote');
-						}
-					}} />
+					rightElement={{ menu: { labels: mainPageMenuItems } }}
+					onRightElementPress={(action) => this.onRightElementPress(action.index)} />
 
 				{this.renderEmptyMessage()}
 
@@ -187,9 +126,8 @@ class MainPage extends Component {
 					enableEmptySections={true}
 					ref={'LISTVIEW'}
 					renderRow={(item) => this.renderListItem(item)} />
-				
-				<ActionButton icon='add' onPress={() => this.createViewAndEditNote(null)} />
 
+				<ActionButton icon='add' onPress={() => this.createViewAndEditNote(null)} />
 			</Container>
 		)
 	}

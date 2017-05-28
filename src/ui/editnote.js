@@ -1,89 +1,86 @@
-import React, { Component, PropTypes } from 'react';
-import {
-	Navigator,
-	TextInput,
-	StyleSheet,
-	BackAndroid,
-	ScrollView,
-	Dimensions,
-	View,
-	Platform,
-} from 'react-native';
+import React, { Component, PropTypes } from "react";
+import { BackAndroid, View, Text, TouchableOpacity, KeyboardAvoidingView, Alert } from "react-native";
 
-import Toolbar from './custom/toolbar.js';
-import Container from './container.js';
-import ActionButton from './custom/actionbutton.js';
-import { UPDOWNMARGIN, SIDEMARGIN } from '../helpers/constant.js';
-import DatabaseHelper from '../helpers/database.js';
-import { Note } from '../model/note.js';
-import { getCreatedOn } from '../helpers/collectionutils.js';
+import { Toolbar, ActionButton, Avatar } from "react-native-material-component";
+import { UPDOWNMARGIN, SIDEMARGIN } from "../helpers/constant.js";
+import { Note } from "../models/note.js";
+import { getCreatedOn } from "../helpers/collectionutils.js";
+import { PRICOLOR, TEXTGRAYSECCOLOR } from "../helpers/constant.js";
+import { RichTextEditor, RichTextToolbar, actions } from "react-native-zss-rich-text-editor";
+import Container from "./container.js";
+import DatabaseHelper from "../helpers/database.js";
+import KeyboardSpacer from "react-native-keyboard-spacer";
+import styles from '../helpers/styles.js';
+import { propTypes, _actions } from '../helpers/constant.js';
 
-const {height, width} = Dimensions.get('window');
+const _customCSS =
+	`#zss_editor_content {
+				padding-left: 0px;
+				padding-right: 0px;
+			}
 
-const MIN_COMPOSER_HEIGHT = 600;
+			#zss_editor_title {
+				padding-left: 0px;
+				padding-right: 0px;
+			}
+			
+			[placeholder]:empty:before {
+				content: attr(placeholder);
+				color: #757575;
+			}
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-	},
-	textInput: {
-		fontSize: 17,
-		fontWeight: '400',
-		color: 'black',
-		paddingTop: UPDOWNMARGIN,
-		paddingBottom: UPDOWNMARGIN,
-		paddingRight: SIDEMARGIN,
-		paddingLeft: SIDEMARGIN,
-	},
-});
-
-
-const propTypes = {
-	navigator: PropTypes.object.isRequired,
-	route: PropTypes.object.isRequired,
-	text: React.PropTypes.string,
-	placeholder: React.PropTypes.string,
-	placeholderTextColor: React.PropTypes.string,
-	multiline: React.PropTypes.bool,
-	autoFocus: React.PropTypes.bool,
-};
-
-const defaultProps = {
-	text: '',
-	placeholder: 'Edit a note...',
-	placeholderTextColor: '#b8b8b8',
-	multiline: true,
-	autoFocus: true,
-};
-
+			[placeholder]:empty:focus:before {
+				content: attr(placeholder);
+				color: #757575;
+			}
+			#separatorContainer {
+				-webkit-user-select: none;
+				padding-left: 0px;
+				padding-right: 0px;
+			}
+			`
 
 class EditPage extends Component {
-
 	constructor(params) {
 		super(params);
+
 		this.state = {
-			note: '',
-			editText: '',
-			title: '',
-			height: height - 55,
-			textSize: this.props.route.textSize,
-		}
+			note: "",
+			editText: "",
+			title: "",
+			textSize: this.props.route.data.textSize,
+			showKeyboardSpacer: this.props.appState === 'initial',
+			icons: {
+				bold: "all-inclusive",
+				unorderedList: "crop-din",
+				INST_LINK: "insert-link",
+			}
+		};
+
+		_customCSS +=
+			`	body {
+				padding-top: 0px;
+				padding-bottom: 0px;
+				padding-left:0px;
+				padding-right:0px;
+				font-size: ${this.state.textSize}px;
+				overflow-y: scroll;
+				-webkit-overflow-scrolling: touch;
+				height: 100%;
+			}`
 
 		this.updateNote = this.updateNote.bind(this);
 		this.deleteNote = this.deleteNote.bind(this);
 
-
-		this.renderTextInput = this.renderTextInput.bind(this);
 		this.addBackEvent = this.addBackEvent.bind(this);
 		this.removeBackEvent = this.removeBackEvent.bind(this);
 
-		this.getDate = this.getDate.bind(this);
-		this.onType = this.onType.bind(this);
-		this.trim = this.trim.bind(this);
+		this.getHTML = this.getHTML.bind(this);
+		this.renderAction = this.renderAction.bind(this);
 	}
 
 	addBackEvent() {
-		BackAndroid.addEventListener('hardwareBackPress', () => {
+		BackAndroid.addEventListener("hardwareBackPress", () => {
 			if (this.props.navigator && this.props.navigator.getCurrentRoutes().length > 1) {
 				this.updateNote();
 				return true;
@@ -93,7 +90,7 @@ class EditPage extends Component {
 	}
 
 	removeBackEvent() {
-		BackAndroid.removeEventListener('hardwareBackPress', () => {
+		BackAndroid.removeEventListener("hardwareBackPress", () => {
 			if (this.props.navigator && this.props.navigator.getCurrentRoutes().length > 1) {
 				this.updateNote();
 				return true;
@@ -103,19 +100,22 @@ class EditPage extends Component {
 	}
 
 	componentDidMount() {
-		let data = this.props.route.data
+		let data = this.props.route.data.note;
 		if (data) {
+			let _icons = this.state.icons;
+			_icons["delete"] = "delete"
 			this.setState({
 				note: data,
 				title: data.createdOn,
 				editText: data.description,
-			})
+				icons: _icons
+			});
 		} else {
 			this.setState({
 				note: null,
 				title: this.getDate(),
-				editText: '',
-			})
+				editText: ""
+			});
 		}
 		this.addBackEvent();
 	}
@@ -124,102 +124,106 @@ class EditPage extends Component {
 		this.removeBackEvent();
 	}
 
+	shouldComponentUpdate(nextProps, nextState) {
+		if (this.props != nextProps) {
+			setTimeout(() => this.setState({ showKeyboardSpacer: nextProps.appState === 'initial' }), 10);
+		}
+		return this.state != nextState;
+	}
+
 	getDate() {
 		let today = new Date();
 		var dd = today.getDate();
 		var mm = today.getMonth(); //January is 0!
 		var yyyy = today.getFullYear();
-		return getCreatedOn(yyyy + '-' + mm + '-' + dd);
+		return getCreatedOn(yyyy + "-" + mm + "-" + dd);
 	}
 
 	updateNote() {
-
-		let text = this.trim(this.state.editText);
-		console.log(text);
-		if (this.state.note && this.state.note.description === text) {
-			this.props.navigator.pop();
-		}
-		else {
-			if (text.length > 0) {
-				let title = text.length > 10 ? text.substring(0, 10) + '...' : text + '...';
-				const date = this.getDate();
-				let note;
-				if (this.state.note) {
-					note = this.state.note;
-					note.setTitle(title.trim());
-					note.setDescription(text.trim())
-					note.setCreatedOn(date);
-					DatabaseHelper.updateNote(note.getId(), note, (result) => {
-						this.props.route.callback();
-						this.props.navigator.pop();
-					})
+		this.getHTML().then((text) => {
+			if (this.state.note && this.state.note.description === text) {
+				this.props.navigator.pop();
+			} else {
+				if (text.length > 0) {
+					let title = text.length > 10 ?
+						text.substring(0, 10) + "..." :
+						text + "...";
+					const date = this.getDate();
+					let note;
+					if (this.state.note) {
+						note = this.state.note;
+						note.setTitle(title.trim());
+						note.setDescription(text.trim());
+						note.setCreatedOn(date);
+						DatabaseHelper.updateNote(note.getId(), note, result => {
+							this.props.route.callback();
+							this.props.navigator.pop();
+						});
+					} else {
+						note = new Note(title.trim(), text.trim(), date);
+						DatabaseHelper.addNewNote(note, result => {
+							this.props.route.callback();
+							this.props.navigator.pop();
+						});
+					}
 				} else {
-					note = new Note(title.trim(), text.trim(), date);
-					DatabaseHelper.addNewNote(note, (result) => {
+					this.props.navigator.pop();
+				}
+			}
+		});
+	}
+
+	deleteNote(note) {
+		Alert
+			.alert(
+			"Are you sure, you want to delete this?", "This will delete the note from this app.",
+			[{
+				text: 'OK',
+				onPress: () => {
+					DatabaseHelper.removeNoteById(note.getId(), result => {
+						this.removeBackEvent();
 						this.props.route.callback();
 						this.props.navigator.pop();
 					});
 				}
-			}else{
-				this.props.navigator.pop();
-			}
-		}
+			},
+			{
+				text: 'CANCEL',
+				onPress: () => {
+
+				}
+			}]);
+
 	}
 
 
-	deleteNote(note) {
-		DatabaseHelper.removeNoteById(note.getId(), (result) => {
-			this.removeBackEvent();
-			this.props.route.callback();
-			this.props.navigator.pop();
-		})
+	async getHTML() {
+		return await this.richtext.getContentHtml();
+
 	}
 
-	trim(str) {
-		return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
-	}
-
-	onType(e) {
-		let newComposerHeight = null;
-		if (e.nativeEvent && e.nativeEvent.contentSize) {
-			newComposerHeight = Math.max(MIN_COMPOSER_HEIGHT, e.nativeEvent.contentSize.height);
-		} else {
-			newComposerHeight = MIN_COMPOSER_HEIGHT;
-		}
-
-		const newText = e.nativeEvent.text;
-		this.setState((previousState) => {
-			return {
-				height: newComposerHeight,
-				editText: newText
-			};
-		});
-	}
-
-
-	renderTextInput() {
+	renderAction(action, selected) {
+		const icon = this.state.icons[action];
+		const _color = selected ? PRICOLOR : TEXTGRAYSECCOLOR;
+		const _size = selected ? (action == actions.insertBulletsList ? 24 : 28) : action == actions.insertBulletsList ? 20 : action == actions.insertLink ? 26 : 22;
 		return (
-			<ScrollView keyboardDismissMode='interactive'>
-				<TextInput
-					onChange={(e) => this.onType(e)}
-					style={[styles.textInput, { height: this.state.height, fontSize: parseInt(this.state.textSize), textAlignVertical: 'top' }]}
-					placeholder={this.props.placeholder}
-					placeholderTextColor={this.props.placeholderTextColor}
-					multiline={this.props.multiline}
-					autoFocus={this.props.autoFocus}
-					value={this.state.editText}
-					enablesReturnKeyAutomatically={true}
-					underlineColorAndroid="transparent" />
-			</ScrollView>
+			<TouchableOpacity style={styles.edit_page_touchable_opacity}
+				onPress={() => {
+					const editor = this.richtext;
+					if (action === actions.setBold || action === actions.insertBulletsList) {
+						editor._sendAction(action);
+					} else if (action === "delete" && this.state) {
+						this.deleteNote(this.state.note);
+					} else if (action === actions.insertLink) {
+						editor.prepareInsert();
+						editor.getSelectedText().then(selectedText => {
+							editor.showLinkDialog(selectedText);
+						});
+					}
+				}}>
+				<Avatar icon={icon} iconColor={_color} iconSize={_size} bgcolor="transparent" />
+			</TouchableOpacity>
 		);
-	}
-
-	renderDelete() {
-		let note = this.state.note;
-		if (note) {
-			return <ActionButton icon='remove' onPress={() => this.deleteNote(note)} />
-		}
-		return null;
 	}
 
 	render() {
@@ -229,14 +233,26 @@ class EditPage extends Component {
 					leftElement="arrow-back"
 					onLeftElementPress={() => this.updateNote()}
 					centerElement={this.state.title} />
-				{this.renderTextInput()}
-				{this.renderDelete()}
+
+				<RichTextEditor
+					style={styles.edit_page_rich_text_editor}
+					contentPlaceholder="Make a new note"
+					ref={r => this.richtext = r}
+					initialContentHTML={this.state.editText}
+					hiddenTitle={true}
+					customCSS={_customCSS} />
+
+				<RichTextToolbar
+					getEditor={() => this.richtext}
+					style={styles.edit_page_rich_text_toolbar}
+					actions={_actions}
+					renderAction={(action, selected) => this.renderAction(action, selected)} />
+				{this.state.showKeyboardSpacer && <KeyboardSpacer />}
 			</Container>
-		)
+		);
 	}
 }
 
 EditPage.propTypes = propTypes;
-EditPage.defaultProps = defaultProps;
 
 export default EditPage;
