@@ -1,5 +1,5 @@
 import React, { Component, PropTypes, } from 'react';
-import { View, StyleSheet, ScrollView, Text, BackAndroid, Switch, Linking, Picker} from 'react-native';
+import { View, StyleSheet, ScrollView, Text, BackAndroid, Switch, Linking, Picker } from 'react-native';
 
 import { Toolbar, Card } from 'react-native-material-component'
 import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE } from '../helpers/constant.js';
@@ -47,19 +47,15 @@ class SettingPage extends Component {
 		this.addBackEvent();
 	}
 
-
-
 	componentWillUnmount() {
 		this.removeBackEvent();
 	}
 
 	onValueChange(size) {
-		this.setState({ textSize: size })
 		setData(FONTSIZE, size);
+		this.setState({ textSize: size })
 	}
-
-
-
+	
 	onEmail() {
 		let email = 'ayush.as.shukla@gmail.com';
 		Communications.email(email, null, null, null, null);
@@ -70,18 +66,18 @@ class SettingPage extends Component {
 			<Container>
 				<Toolbar
 					leftElement="arrow-back"
-					onLeftElementPress={this.props.navigator.pop()}
+					onLeftElementPress={() => this.props.navigator.pop()}
 					centerElement={this.props.route.name} />
 
 				<ScrollView style={styles.container_with_flex_1} keyboardDismissMode='interactive'>
-					<Card style={styles.card_view} fullWidth="1">
+					<Card style={{minHeight: 50, justifyContent: 'center'}} fullWidth="1">
 						<View style={styles.setting_page_inside_card_view}>
 							<Text style={styles.setting_page_text}>Accept Privacy Policy </Text>
 							<Switch style={styles.setting_page_switch} value={true} disabled={true} />
 						</View>
 					</Card>
 
-					<Card style={styles.card_view} fullWidth="1">
+					<Card style={{minHeight: 50, justifyContent: 'center'}} fullWidth="1">
 						<View style={[styles.setting_page_inside_card_view, { flexDirection: 'column' }]}>
 							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Set text size of editable view</Text>
 							<View style={{ margin: UPDOWNMARGIN, height: 1, backgroundColor: '#131313' }} />
@@ -97,7 +93,7 @@ class SettingPage extends Component {
 						</View>
 					</Card>
 
-					<Card style={styles.card_view} fullWidth="1">
+					<Card style={{minHeight: 50, justifyContent: 'center'}} fullWidth="1">
 						<View style={[styles.setting_page_inside_card_view, { flexDirection: 'column' }]}>
 							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Airnote is simple note making app. Which is built using javaScript and react native framework.</Text>
 							<View style={{ margin: UPDOWNMARGIN, height: 1, backgroundColor: '#131313' }} />
@@ -106,7 +102,7 @@ class SettingPage extends Component {
 						</View>
 					</Card>
 
-					<Card style={styles.card_view} fullWidth="1">
+					<Card style={{minHeight: 50, justifyContent: 'center'}} fullWidth="1">
 						<View style={[styles.setting_page_inside_card_view, { flexDirection: 'column' }]}>
 							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Support development of airnote for android. Paypal airnote</Text>
 							<View style={{ margin: UPDOWNMARGIN, height: 1, backgroundColor: '#131313' }} />

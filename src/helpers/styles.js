@@ -85,9 +85,47 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 		justifyContent: 'flex-end'
 	},
-	card_view: {
-		minHeight: 50,
-		justifyContent: 'center'
+
+	text_with_margin_bottom_and_font_size_14: {
+		color: 'white',
+		fontSize: 14,
+		marginBottom: 5
+	},
+	row_back_swipe_list_view: {
+		alignItems: 'center',
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+	},
+	back_right_holder_swipe_list_view: {
+		alignItems: 'flex-start',
+		bottom: 4,
+		justifyContent: 'center',
+		position: 'absolute',
+		top: 4,
+		paddingLeft: 15,
+		width: 120
+	},
+	back_right_button_swipe_list_view: {
+		backgroundColor: '#eba510',
+		marginTop: 0,
+		marginBottom: 0,
+		right: 0
+	},
+	back_left_holder_swipe_list_view: {
+		alignItems: 'flex-end',
+		bottom: 4,
+		justifyContent: 'center',
+		position: 'absolute',
+		top: 4,
+		paddingRight: 15,
+		width: 120
+	},
+	back_left_button_swipe_list_view: {
+		backgroundColor: '#0eb244',
+		marginTop: 0,
+		marginBottom: 0,
+		left: 0
 	}
 });
 

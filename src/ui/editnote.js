@@ -43,7 +43,6 @@ const _customCSS =
 class EditPage extends Component {
 	constructor(params) {
 		super(params);
-
 		this.state = {
 			note: "",
 			editText: "",
@@ -58,23 +57,22 @@ class EditPage extends Component {
 		};
 
 		_customCSS +=
-			`	body {
+			`body {
 				padding-top: 0px;
 				padding-bottom: 0px;
 				padding-left:0px;
 				padding-right:0px;
-				font-size: ${this.state.textSize}px;
+				font-size: ${this.props.route.data.textSize}px;
 				overflow-y: scroll;
 				-webkit-overflow-scrolling: touch;
 				height: 100%;
-			}`
-
-		this.updateNote = this.updateNote.bind(this);
-		this.deleteNote = this.deleteNote.bind(this);
-
+			}`;
+		
 		this.addBackEvent = this.addBackEvent.bind(this);
 		this.removeBackEvent = this.removeBackEvent.bind(this);
-
+		
+		this.updateNote = this.updateNote.bind(this);
+		this.deleteNote = this.deleteNote.bind(this);
 		this.getHTML = this.getHTML.bind(this);
 		this.renderAction = this.renderAction.bind(this);
 	}
@@ -140,14 +138,13 @@ class EditPage extends Component {
 	}
 
 	updateNote() {
-		this.getHTML().then((text) => {
+		this.getHTML()
+		.then(text => {
 			if (this.state.note && this.state.note.description === text) {
 				this.props.navigator.pop();
 			} else {
 				if (text.length > 0) {
-					let title = text.length > 10 ?
-						text.substring(0, 10) + "..." :
-						text + "...";
+					let title = text.length > 10 ? text.substring(0, 10) + "..." : text + "...";
 					const date = this.getDate();
 					let note;
 					if (this.state.note) {
@@ -156,13 +153,13 @@ class EditPage extends Component {
 						note.setDescription(text.trim());
 						note.setCreatedOn(date);
 						DatabaseHelper.updateNote(note.getId(), note, result => {
-							this.props.route.callback();
+							this.props.route.data.callback();
 							this.props.navigator.pop();
 						});
 					} else {
 						note = new Note(title.trim(), text.trim(), date);
 						DatabaseHelper.addNewNote(note, result => {
-							this.props.route.callback();
+							this.props.route.data.callback();
 							this.props.navigator.pop();
 						});
 					}
@@ -174,15 +171,13 @@ class EditPage extends Component {
 	}
 
 	deleteNote(note) {
-		Alert
-			.alert(
-			"Are you sure, you want to delete this?", "This will delete the note from this app.",
+		Alert.alert(null, 'Are you sure you want to delete this note?',
 			[{
 				text: 'OK',
 				onPress: () => {
 					DatabaseHelper.removeNoteById(note.getId(), result => {
 						this.removeBackEvent();
-						this.props.route.callback();
+						this.props.route.data.callback();
 						this.props.navigator.pop();
 					});
 				}
@@ -209,10 +204,12 @@ class EditPage extends Component {
 		return (
 			<TouchableOpacity style={styles.edit_page_touchable_opacity}
 				onPress={() => {
+
 					const editor = this.richtext;
 					if (action === actions.setBold || action === actions.insertBulletsList) {
 						editor._sendAction(action);
 					} else if (action === "delete" && this.state) {
+
 						this.deleteNote(this.state.note);
 					} else if (action === actions.insertLink) {
 						editor.prepareInsert();
