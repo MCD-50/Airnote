@@ -14,9 +14,7 @@ You can see [this repo](https://github.com/oblador/react-native-vector-icons) fo
 
 
 
-
-
-If case of any error while building your app follow below instructions.
+## If case of any error while building your app follow below instructions.
 
 ### React Native Link (recommended)
 > Make sure you have atleast v0.31.0 react-native version.
