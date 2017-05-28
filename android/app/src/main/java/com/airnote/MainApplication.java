@@ -23,6 +23,8 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     public List<ReactPackage> getPackages() {
+      long size = 50L * 1024L * 1024L; // 50 MB
+      com.facebook.react.modules.storage.ReactDatabaseSupplier.getInstance(getApplicationContext()).setMaximumSize(size);
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
           new VectorIconsPackage(),
