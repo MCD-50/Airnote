@@ -115,7 +115,7 @@ class SettingPage extends Component {
 					</Card>
 
 					<View style={[styles.setting_page_inside_card_view, { justifyContent: 'flex-end' }]}>
-						<Text style={[styles.setting_page_text, { color: '#b2b2b2', padding: 0, paddingLeft: UPDOWNMARGIN, paddingRight: UPDOWNMARGIN, fontSize: 13, alignItems: 'flex-end' }]}>Airnote 1.0</Text>
+						<Text style={[styles.setting_page_text, { color: '#b2b2b2', padding: 0, paddingLeft: UPDOWNMARGIN, paddingRight: UPDOWNMARGIN, fontSize: 13, alignItems: 'flex-end' }]}>Airnote 1.1</Text>
 					</View>
 
 				</ScrollView>
