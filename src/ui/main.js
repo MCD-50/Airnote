@@ -1,9 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import { ListView, View, Text, Linking, Alert, TouchableOpacity } from 'react-native';
 
-import { Toolbar, ActionButton, Card, Toast, SwipeListView } from 'react-native-material-component'
+import { Toolbar, FloatingActionButton, Card, Toast, SwipeListView } from 'react-native-material-component'
 import { getData } from '../helpers/appstore.js';
-import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE } from '../helpers/constant.js';
+import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE, FONTSTYLE } from '../helpers/constant.js';
 import { Page } from '../enums/page.js';
 import Container from './container.js';
 import SettingPage from './setting.js';
@@ -54,24 +54,24 @@ class MainPage extends Component {
 
 	createViewAndEditNote(item) {
 		getData(FONTSIZE)
-			.then((val) => {
+			.then((size) => {
 				const page = Page.EDIT_PAGE;
 				const data = {
 					note: item,
 					callback: this.callback,
-					textSize: val ? val : 16
+					textSize: size ? size : 16,
 				};
-				this.props.navigator.push({ id: page.id, name: page.name, data: data });
+				this.props.navigator.push({ id: page.id, name: page.name, data: data })
 			});
 	}
 
 	onRightElementPress(index) {
 		if (mainPageMenuItems[index] === 'Settings') {
 			getData(FONTSIZE)
-				.then((val) => {
+				.then((size) => {
 					const page = Page.SETTING_PAGE;
 					const data = {
-						textSize: val ? val : 16
+						textSize: size ? size : 16,
 					};
 					this.props.navigator.push({ id: page.id, name: page.name, data: data })
 				});
@@ -120,7 +120,7 @@ class MainPage extends Component {
 	}
 
 	renderListItem(item) {
-		const title = item.title.replace(/(<([^>]+)>)/g, "_%_").split("_%_").join(' ').trim();
+		const title = item.title;
 		const description = item.description.replace(/(<([^>]+)>)/g, "_%_").split("_%_").join(' ').trim();
 		return (
 			<Card style={{ minHeight: 50, justifyContent: 'center' }} fullWidth="1" onPress={() => this.createViewAndEditNote(item)}>
@@ -165,7 +165,7 @@ class MainPage extends Component {
 					leftOpenValue={0}
 					rightOpenValue={-120} />
 
-				<ActionButton icon='add' onPress={() => this.createViewAndEditNote(null)} />
+				<FloatingActionButton icon='add' onPress={() => this.createViewAndEditNote(null)} />
 			</Container>
 		)
 	}

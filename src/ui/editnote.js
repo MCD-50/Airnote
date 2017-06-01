@@ -14,7 +14,7 @@ import styles from '../helpers/styles.js';
 import { propTypes, _actions } from '../helpers/constant.js';
 
 const _customCSS =
-	`#zss_editor_content {
+			`#zss_editor_content {
 				padding-left: 0px;
 				padding-right: 0px;
 			}
@@ -37,17 +37,16 @@ const _customCSS =
 				-webkit-user-select: none;
 				padding-left: 0px;
 				padding-right: 0px;
-			}
-			`
+			}`
 
 class EditPage extends Component {
 	constructor(params) {
 		super(params);
+		console.log(this.props.route.data)
 		this.state = {
 			note: "",
 			editText: "",
 			title: "",
-			textSize: this.props.route.data.textSize,
 			showKeyboardSpacer: this.props.appState === 'initial',
 			icons: {
 				bold: "all-inclusive",
@@ -67,6 +66,8 @@ class EditPage extends Component {
 				-webkit-overflow-scrolling: touch;
 				height: 100%;
 			}`;
+
+		console.log(_customCSS);
 		
 		this.addBackEvent = this.addBackEvent.bind(this);
 		this.removeBackEvent = this.removeBackEvent.bind(this);
@@ -144,7 +145,8 @@ class EditPage extends Component {
 				this.props.navigator.pop();
 			} else {
 				if (text.length > 0) {
-					let title = text.length > 10 ? text.substring(0, 10) + "..." : text + "...";
+					let title = text.replace(/(<([^>]+)>)/g, "_%_").split("_%_").join(' ').trim();
+					title = title.length > 10 ? title.substring(0, 10).trim() + "..." : title + "...";
 					const date = this.getDate();
 					let note;
 					if (this.state.note) {

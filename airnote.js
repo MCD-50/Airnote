@@ -39,7 +39,6 @@ class Airnote extends Component {
 	}
 	
 	handleAppStateChange(nextAppState){
-		console.log(nextAppState);
 		if(nextAppState === 'background'){
 			this.setState({appState:nextAppState});
 			BackAndroid.exitApp();
@@ -65,8 +64,7 @@ class Airnote extends Component {
 				<Navigator
 					initialRoute={{ id: "1", name: "Splash" }}
 					renderScene={this.renderScene.bind(this)}
-					configureScene={(route, routeStack) =>
-						Navigator.SceneConfigs.FloatFromBottomAndroid}
+					configureScene={(route, routeStack) => Navigator.SceneConfigs.FadeAndroid }
 				/>
 			</ThemeProvider>
 		);

@@ -2,7 +2,7 @@ import React, { Component, PropTypes, } from 'react';
 import { View, StyleSheet, ScrollView, Text, BackAndroid, Switch, Linking, Picker } from 'react-native';
 
 import { Toolbar, Card } from 'react-native-material-component'
-import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE } from '../helpers/constant.js';
+import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE, FONTSTYLE } from '../helpers/constant.js';
 import { setData } from '../helpers/appstore.js';
 import styles from '../helpers/styles.js';
 import Container from './container.js';
@@ -13,14 +13,17 @@ class SettingPage extends Component {
 
 	constructor(params) {
 		super(params);
+		
+		const data = this.props.route.data;
 		this.state = {
-			textSize: this.props.route.data.textSize
+			textSize: data.textSize,
 		}
 
 		this.addBackEvent = this.addBackEvent.bind(this);
 		this.removeBackEvent = this.removeBackEvent.bind(this);
 		this.onEmail = this.onEmail.bind(this);
-		this.onValueChange = this.onValueChange.bind(this);
+		this.onTextSizeChanged = this.onTextSizeChanged.bind(this);
+		this.onTextStyleChanged = this.onTextStyleChanged.bind(this);
 	}
 
 	addBackEvent() {
@@ -51,7 +54,12 @@ class SettingPage extends Component {
 		this.removeBackEvent();
 	}
 
-	onValueChange(size) {
+	onTextStyleChanged(_style) {
+		setData(FONTSTYLE, _style);
+		this.setState({ textStyle: _style })
+	}
+
+	onTextSizeChanged(size) {
 		setData(FONTSIZE, size);
 		this.setState({ textSize: size })
 	}
@@ -79,11 +87,11 @@ class SettingPage extends Component {
 
 					<Card style={{minHeight: 50, justifyContent: 'center'}} fullWidth="1">
 						<View style={[styles.setting_page_inside_card_view, { flexDirection: 'column' }]}>
-							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Set text size of editable view</Text>
+							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Set text size for editor</Text>
 							<View style={{ margin: UPDOWNMARGIN, height: 1, backgroundColor: '#131313' }} />
 							<Picker style={{ flex: 1 }}
 								selectedValue={this.state.textSize}
-								onValueChange={(size) => this.onValueChange(size)}>
+								onValueChange={(size) => this.onTextSizeChanged(size)}>
 								<Picker.Item label="16" value="16" />
 								<Picker.Item label="17" value="17" />
 								<Picker.Item label="18" value="18" />
@@ -98,7 +106,7 @@ class SettingPage extends Component {
 							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Airnote is simple note making app. Which is built using javaScript and react native framework.</Text>
 							<View style={{ margin: UPDOWNMARGIN, height: 1, backgroundColor: '#131313' }} />
 							<Text onPress={() => this.onEmail()} style={[styles.setting_page_text, { fontSize: 15, color: '#dd2c00', paddingTop: 5, paddingLeft: UPDOWNMARGIN, paddingRight: UPDOWNMARGIN }]}>Contact developer</Text>
-							<Text onPress={() => Linking.openURL('https://github.com/MCD-50/Airnote')} style={[styles.setting_page_text, { fontSize: 15, color: '#dd2c00', paddingTop: 5, paddingLeft: UPDOWNMARGIN, paddingRight: UPDOWNMARGIN }]}>Source code at github</Text>
+							<Text onPress={() => Linking.openURL('https://github.com/MCD-50/Airnote-Phone')} style={[styles.setting_page_text, { fontSize: 15, color: '#dd2c00', paddingTop: 5, paddingLeft: UPDOWNMARGIN, paddingRight: UPDOWNMARGIN }]}>Source code at github</Text>
 						</View>
 					</Card>
 
@@ -107,6 +115,14 @@ class SettingPage extends Component {
 							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Support development of airnote for android. Paypal airnote</Text>
 							<View style={{ margin: UPDOWNMARGIN, height: 1, backgroundColor: '#131313' }} />
 							<Text onPress={() => Linking.openURL('https://www.paypal.com/AyushAS')} style={[styles.setting_page_text, { fontSize: 15, color: '#dd2c00', padding: 1, paddingLeft: UPDOWNMARGIN, paddingRight: UPDOWNMARGIN }]}>Buy coffee for developer</Text>
+						</View>
+					</Card>
+
+					<Card style={{minHeight: 50, justifyContent: 'center'}} fullWidth="1">
+						<View style={[styles.setting_page_inside_card_view, { flexDirection: 'column' }]}>
+							<Text style={[styles.setting_page_text, { fontSize: 15 }]}>Powered by react-native-material-component</Text>
+							<View style={{ margin: UPDOWNMARGIN, height: 1, backgroundColor: '#131313' }} />
+							<Text onPress={() => Linking.openURL('https://github.com/MCD-50/react-native-material-component')} style={[styles.setting_page_text, { fontSize: 15, color: '#dd2c00', padding: 1, paddingLeft: UPDOWNMARGIN, paddingRight: UPDOWNMARGIN }]}>Get react-native-material-component for faster development.</Text>
 						</View>
 					</Card>
 
