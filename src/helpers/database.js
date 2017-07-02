@@ -17,7 +17,7 @@ class DatabaseHelper extends Component {
 	}
 
 	convertToNote(results){
-		let note = new Note(results.title, results.description, results.createdOn)
+		let note = new Note(results.description, results.createdOn, results.endsOn)
 		note.setId(results._id);
 		return note;
 	}

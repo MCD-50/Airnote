@@ -3,6 +3,8 @@ import { View, StatusBar } from 'react-native';
 
 import styles from './../helpers/styles.js';
 
+import { PRICOLOR } from '../helpers/constant';
+
 const propTypes = {
 	children: PropTypes.node,
 	color: PropTypes.string,
@@ -13,7 +15,7 @@ class Container extends Component {
 		if (this.props.color) {
 			return this.props.color;
 		}
-		return '#2e3c98';
+		return PRICOLOR;
 	}
 
 	render() {

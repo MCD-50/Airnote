@@ -3,7 +3,7 @@ import { ListView, View, Text, Linking, Alert, TouchableOpacity } from 'react-na
 
 import { Toolbar, FloatingActionButton, Card, Toast, SwipeListView } from 'react-native-material-component'
 import { getData } from '../helpers/appstore.js';
-import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE, FONTSTYLE } from '../helpers/constant.js';
+import { SIDEMARGIN, UPDOWNMARGIN, FONTSIZE, FONTSTYLE, PRICOLOR } from '../helpers/constant.js';
 import { Page } from '../enums/page.js';
 import Container from './container.js';
 import SettingPage from './setting.js';
@@ -120,19 +120,18 @@ class MainPage extends Component {
 	}
 
 	renderListItem(item) {
-		const title = item.title;
 		const description = item.description.replace(/(<([^>]+)>)/g, "_%_").split("_%_").join(' ').trim();
 		return (
-			<Card style={{ minHeight: 50, justifyContent: 'center' }} fullWidth="1" onPress={() => this.createViewAndEditNote(item)}>
+			<Card style={{ minHeight: 50, paddingTop: 10, paddingBottom: 10 }} fullWidth="1" onPress={() => this.createViewAndEditNote(item)}>
 				<View style={styles.main_page_list_item_container}>
 					<Text style={styles.main_page_header_text}>
-						{title}
+						{item.createdOn}
 					</Text>
-					<Text style={styles.main_page_description_text}>
+					<Text style={[styles.main_page_description_text]}>
 						{description.substring(0, 50) + '...'}
 					</Text>
-					<Text style={styles.main_page_footer_text}>
-						{item.createdOn}
+					<Text style={[styles.main_page_description_text, { color: PRICOLOR }]}>
+						{item.endsOn}
 					</Text>
 				</View>
 			</Card>

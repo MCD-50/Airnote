@@ -1,16 +1,12 @@
 export class Note{
-    constructor(title, description, createdOn){
-        this.title = title;
+    constructor(description, createdOn, endsOn){
         this.description = description;
         this.createdOn = createdOn;
+        this.endsOn = endsOn;
     }
 
     getCreatedOn(){
         return this.createdOn;
-    }
-
-    getTitle(){
-        return this.title;
     }
 
     getDescription(){
@@ -33,8 +29,12 @@ export class Note{
         this.createdOn = createdOn;
     }
 
-    setTitle(title){
-        this.title = title;
+    getEndsOn(){
+        return this.endsOn;
+    }
+
+    setEndsOn(endsOn){
+        this.endsOn = endsOn;
     }
 
 }

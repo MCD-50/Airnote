@@ -1,12 +1,11 @@
 import { StyleSheet } from 'react-native';
-import { SIDEMARGIN, UPDOWNMARGIN } from './constant.js';
+import { SIDEMARGIN, UPDOWNMARGIN, PRICOLOR } from './constant.js';
 
 const styles = StyleSheet.create({
 	container_with_flex_1: {
 		flex: 1,
 	},
-
-
+	
 	splash_screen_view: {
 		flex: 1,
 		alignItems: 'center',
@@ -107,7 +106,7 @@ const styles = StyleSheet.create({
 		width: 120
 	},
 	back_right_button_swipe_list_view: {
-		backgroundColor: '#eba510',
+		backgroundColor: PRICOLOR,
 		marginTop: 0,
 		marginBottom: 0,
 		right: 0
